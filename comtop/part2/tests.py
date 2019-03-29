@@ -19,8 +19,9 @@ class MatrixTestCase(TestCase):
 class KMTestCase(TestCase):
     def setUp(self):
         self.m = randomMatrix(3,10)
+        self.dist = next(matrix.distMatrix(self.m))
     def test(self):
-        projected_data = keplermodule.mapper.fit_transform(self.m)
+        projected_data = keplermodule.mapper.fit_transform(self.dist)
         graph = keplermodule.mapper.map(projected_data)
         keplermodule.mapper.visualize(graph)
 
