@@ -1,7 +1,7 @@
 # Import the class
 import kmapper as km
 
-mapper = km.KeplerMapper(verbose=1)
+mapper = km.KeplerMapper(verbose=1)  
 '''
 # Some sample data
 from sklearn import datasets
