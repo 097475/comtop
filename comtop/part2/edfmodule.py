@@ -4,7 +4,7 @@ import numpy as np
 import pyedflib
 from stacklineplot import stackplot
 
-
+#TODO: use paths
 def test():
     f = pyedflib.data.test_generator()
     print("\nlibrary version: %s" % pyedflib.version.version)
@@ -67,7 +67,7 @@ def edfToMatrix(data):
         ret.append(data.readSignal(i))
     return np.array(ret)
 
-def plotEDF(data):
+def plotEDF(data):##TODO
     
     f = pyedflib.data.test_generator()
     n = f.signals_in_file
