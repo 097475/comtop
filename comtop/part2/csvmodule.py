@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-
+##TODO memory leaks
 def getDataFrameFromText(path, index = 0, delim = ','):
     return pd.read_csv(path, index_col = index, sep = delim)
 

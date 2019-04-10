@@ -4,7 +4,7 @@ import numpy as np
 import pyedflib
 from stacklineplot import stackplot
 
-#TODO: use paths
+#TODO: memory leaks
 def test():
     f = pyedflib.data.test_generator()
     print("\nlibrary version: %s" % pyedflib.version.version)
@@ -60,6 +60,10 @@ def test():
     f._close()
     del f
 
+def readEDF(path):
+    return pyedflib.EdfReader(path)
+
+
 def edfToMatrix(data):
     height = data.signals_in_file
     ret = []
@@ -67,19 +71,16 @@ def edfToMatrix(data):
         ret.append(data.readSignal(i))
     return np.array(ret)
 
-def plotEDF(data):##TODO
-    
-    f = pyedflib.data.test_generator()
-    n = f.signals_in_file
-    signal_labels = f.getSignalLabels()
-    n_min = f.getNSamples()[0]
-    sigbufs = [np.zeros(f.getNSamples()[i]) for i in np.arange(n)]
+def plotEDF(data):##TODO dati si cancellano dopo plotting
+    n = data.signals_in_file
+    signal_labels = data.getSignalLabels()
+    n_min = data.getNSamples()[0]
+    sigbufs = [np.zeros(data.getNSamples()[i]) for i in np.arange(n)]
     for i in np.arange(n):
-        sigbufs[i] = f.readSignal(i)
+        sigbufs[i] = data.readSignal(i)
         if n_min < len(sigbufs[i]):
             n_min = len(sigbufs[i])
-    f._close()
-    del f
+    data._close()
 
     n_plot = np.min((n_min, 2000))
     sigbufs_plot = np.zeros((n, n_plot))
@@ -89,11 +90,17 @@ def plotEDF(data):##TODO
     stackplot(sigbufs_plot[:, :n_plot], ylabels=signal_labels)
 
 if __name__ == '__main__':
+    '''
     r = edfToMatrix(pyedflib.data.test_generator())
     print(len(r))
     print(len(r[0]))
     print(len(r[1]))
     print(type(r))
     print(type(r[0]))
-    plotEDF(r)
+    plotEDF(pyedflib.data.test_generator())
+    '''
+    a = readEDF('prova.edf')
+    #plotEDF(a)
+    print(edfToMatrix(a))
+
    
