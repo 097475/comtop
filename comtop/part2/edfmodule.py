@@ -80,7 +80,7 @@ def plotEDF(data):##TODO dati si cancellano dopo plotting
         sigbufs[i] = data.readSignal(i)
         if n_min < len(sigbufs[i]):
             n_min = len(sigbufs[i])
-    data._close()
+    #data._close()
 
     n_plot = np.min((n_min, 2000))
     sigbufs_plot = np.zeros((n, n_plot))
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     plotEDF(pyedflib.data.test_generator())
     '''
     a = readEDF('prova.edf')
-    #plotEDF(a)
+    plotEDF(a)
     print(edfToMatrix(a))
 
    

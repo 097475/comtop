@@ -1,7 +1,9 @@
 from django.test import TestCase
-from . import matrix
-from . import keplermodule
-from . import entropy
+
+#import part2.matrix as matrix
+#import part2.keplermodule as keplermodule
+#import part2.entropy as entropy
+import matrix, keplermodule, entropy, edfmodule, csvmodule
 import numpy
 import random
 # Create your tests here.
@@ -34,3 +36,12 @@ class EntropyTestCase(TestCase):
         self.m = randomEntropyMatrix(random.randint(1,101))
     def test(self):
         entropy.entropy(self.m)
+
+
+if __name__ == '__main__':
+    a = edfmodule.readEDF('sample.edf')
+    mat = edfmodule.edfToMatrix(a)
+    dist = matrix.distMatrix(mat[:,:10])
+    projected_data = keplermodule.mapper.fit_transform(dist)
+    graph = keplermodule.mapper.map(projected_data)
+    keplermodule.mapper.visualize(graph)
