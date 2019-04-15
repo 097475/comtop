@@ -9,6 +9,7 @@ def getDataFrameFromText(path, index = 0, delim = ','):
 def plotDF(data):
     plt.plot(data)
     plt.savefig('test.png')
+    plt.show()
 
 def getMatrixFromDataFrame(data):
     return data.values
