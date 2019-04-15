@@ -1,7 +1,8 @@
 # Import the class
-import kmapper as km
+import kmapper
 
-mapper = km.KeplerMapper(verbose=1)  
+def getMapper():
+    return kmapper.KeplerMapper(verbose=0)  
 
 '''
 # Some sample data

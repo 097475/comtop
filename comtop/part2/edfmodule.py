@@ -1,64 +1,77 @@
-import os
+import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
 import numpy as np
-
 import pyedflib
-from stacklineplot import stackplot
 
-#TODO: memory leaks
-def test():
-    f = pyedflib.data.test_generator()
-    print("\nlibrary version: %s" % pyedflib.version.version)
 
-    print("\ngeneral header:\n")
+def stackplot(marray, seconds=None, start_time=None, ylabels=None):
+    """
+    will plot a stack of traces one above the other assuming
+    marray.shape = numRows, numSamples
+    """
+    tarray = np.transpose(marray)
+    stackplot_t(tarray, seconds=seconds, start_time=start_time, ylabels=ylabels)
+    plt.savefig("test.svg") ## inserire path
 
-    # print("filetype: %i\n"%hdr.filetype);
-    print("edfsignals: %i" % f.signals_in_file)
-    print("file duration: %i seconds" % f.file_duration)
-    print("startdate: %i-%i-%i" % (f.getStartdatetime().day,f.getStartdatetime().month,f.getStartdatetime().year))
-    print("starttime: %i:%02i:%02i" % (f.getStartdatetime().hour,f.getStartdatetime().minute,f.getStartdatetime().second))
-    # print("patient: %s" % f.getP);
-    # print("recording: %s" % f.getPatientAdditional())
-    print("patientcode: %s" % f.getPatientCode())
-    print("gender: %s" % f.getGender())
-    print("birthdate: %s" % f.getBirthdate())
-    print("patient_name: %s" % f.getPatientName())
-    print("patient_additional: %s" % f.getPatientAdditional())
-    print("admincode: %s" % f.getAdmincode())
-    print("technician: %s" % f.getTechnician())
-    print("equipment: %s" % f.getEquipment())
-    print("recording_additional: %s" % f.getRecordingAdditional())
-    print("datarecord duration: %f seconds" % f.getFileDuration())
-    print("number of datarecords in the file: %i" % f.datarecords_in_file)
-    print("number of annotations in the file: %i" % f.annotations_in_file)
 
-    channel = 7
-    print("\nsignal parameters for the %d.channel:\n\n" % channel)
+def stackplot_t(tarray, seconds=None, start_time=None, ylabels=None):
+    """
+    will plot a stack of traces one above the other assuming
+    tarray.shape =  numSamples, numRows
+    """
+    data = tarray
+    numSamples, numRows = tarray.shape
+    # data = np.random.randn(numSamples,numRows) # test data
+    # data.shape = numSamples, numRows
+    if seconds:
+        t = seconds * np.arange(numSamples, dtype=float)/numSamples
+    # import pdb
+    # pdb.set_trace()
+        if start_time:
+            t = t+start_time
+            xlm = (start_time, start_time+seconds)
+        else:
+            xlm = (0,seconds)
 
-    print("label: %s" % f.getLabel(channel))
-    print("samples in file: %i" % f.getNSamples()[channel])
-    # print("samples in datarecord: %i" % f.get
-    print("physical maximum: %f" % f.getPhysicalMaximum(channel))
-    print("physical minimum: %f" % f.getPhysicalMinimum(channel))
-    print("digital maximum: %i" % f.getDigitalMaximum(channel))
-    print("digital minimum: %i" % f.getDigitalMinimum(channel))
-    print("physical dimension: %s" % f.getPhysicalDimension(channel))
-    print("prefilter: %s" % f.getPrefilter(channel))
-    print("transducer: %s" % f.getTransducer(channel))
-    print("samplefrequency: %f" % f.getSampleFrequency(channel))
+    else:
+        t = np.arange(numSamples, dtype=float)
+        xlm = (0,numSamples)
 
-    annotations = f.readAnnotations()
-    for n in np.arange(f.annotations_in_file):
-        print("annotation: onset is %f    duration is %s    description is %s" % (annotations[0][n],annotations[1][n],annotations[2][n]))
+    ticklocs = []
+    ax = plt.subplot(111)
+    plt.xlim(*xlm)
+    # xticks(np.linspace(xlm, 10))
+    dmin = data.min()
+    dmax = data.max()
+    dr = (dmax - dmin)*0.7  # Crowd them a bit.
+    y0 = dmin
+    y1 = (numRows-1) * dr + dmax
+    plt.ylim(y0, y1)
 
-    buf = f.readSignal(channel)
-    n = 200
-    print("\nread %i samples\n" % n)
-    result = ""
-    for i in np.arange(n):
-        result += ("%.1f, " % buf[i])
-    print(result)
-    f._close()
-    del f
+    segs = []
+    for i in range(numRows):
+        segs.append(np.hstack((t[:,np.newaxis], data[:,i,np.newaxis])))
+        # print "segs[-1].shape:", segs[-1].shape
+        ticklocs.append(i*dr)
+
+    offsets = np.zeros((numRows,2), dtype=float)
+    offsets[:,1] = ticklocs
+
+    lines = LineCollection(segs, offsets=offsets,
+                           transOffset=None,
+                           )
+
+    ax.add_collection(lines)
+
+    # set the yticks to use axes coords on the y axis
+    ax.set_yticks(ticklocs)
+    # ax.set_yticklabels(['PG3', 'PG5', 'PG7', 'PG9'])
+    # if not plt.ylabels:
+    plt.ylabels = ["%d" % ii for ii in range(numRows)]
+    ax.set_yticklabels(ylabels)
+
+    plt.xlabel('time (s)')
+
 
 def readEDF(path):
     return pyedflib.EdfReader(path)
@@ -71,7 +84,7 @@ def edfToMatrix(data):
         ret.append(data.readSignal(i))
     return np.array(ret)
 
-def plotEDF(data):##TODO dati si cancellano dopo plotting
+def plotEDF(data):
     n = data.signals_in_file
     signal_labels = data.getSignalLabels()
     n_min = data.getNSamples()[0]
@@ -80,8 +93,6 @@ def plotEDF(data):##TODO dati si cancellano dopo plotting
         sigbufs[i] = data.readSignal(i)
         if n_min < len(sigbufs[i]):
             n_min = len(sigbufs[i])
-    #data._close()
-
     n_plot = np.min((n_min, 2000))
     sigbufs_plot = np.zeros((n, n_plot))
     for i in np.arange(n):

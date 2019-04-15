@@ -7,15 +7,20 @@ import math
 ##check empty matrix
 ##check logarithm
 ##matrix with all infinities
+
+
+
 def entropy(m):
     if len(m[0]) != 2:
         raise ValueError()
     if m == []:
         return 0
+
     values =[]
     ltot = 0
     _max = None
     infs = []
+    
     for row in m:
         if row[1] == math.inf:
             infs.append(row)

@@ -7,6 +7,10 @@ This is a temporary script file.
 
 import numpy
 import scipy.spatial.distance as dist
+import tests
+
+
+
 
 
 def corrMatrix(m, window = 0, overlap = 0):
@@ -21,22 +25,19 @@ def corrMatrix(m, window = 0, overlap = 0):
             raise ValueError("window must be <= the number of columns of input matrix")
         if overlap < 0:
             raise ValueError("overlap must be >= 0")
-            
-        windows,remainder = divmod(len(m[0]),window)
-        cols = len(m[0])
+        if overlap >= window:
+            raise ValueError("overlap must be less than window")
+
+        cols = len(m[0]) 
         step = window - overlap
-        if (cols - window) % step != 0:  ##invalid overlap, reset overlap to step=1
-            overlap = window - 1
-            windows = 1 + cols - window
-        else:
-            windows = 1 + (cols - window) // step
+        windows = 1 + (cols - window) // step
 
         for i in range(windows):
             tmp = m[:,window*i - overlap*i : window*(i+1) - overlap*i]
             yield numpy.corrcoef(tmp)  
 
     if window > 0:
-        _corrMatrix(m,window,overlap)
+        return _corrMatrix(m,window,overlap)
     else:
         return numpy.corrcoef(m)
 
@@ -49,24 +50,22 @@ def distMatrix(m,window = 0, overlap = 0, type = 'euclidean'):
             raise ValueError("window must be >= 0")
         if overlap < 0:
             raise ValueError("overlap must be >= 0")
+        if overlap >= window:
+            raise ValueError("overlap must be less than window")
         if type not in ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule']:
             raise ValueError("invalid distance algorithm") 
 
-        windows,remainder = divmod(len(m[0]),window)
-        cols = len(m[0])
+        cols = len(m[0]) 
         step = window - overlap
-        if (cols - window) % step != 0:  ##invalid overlap, reset overlap to step=1
-            overlap = window - 1
-            windows = 1 + cols - window
-        else:
-            windows = 1 + (cols - window) // step
+        windows = 1 + (cols - window) // step
 
         for i in range(windows):
             tmp = m[:,window*i - overlap*i : window*(i+1) - overlap*i]
+            print(tmp)
             yield dist.squareform(dist.pdist(tmp.transpose(), metric = type))
 
     if window > 0:
-        _distMatrix(m,window,overlap,type)   
+        return _distMatrix(m,window,overlap,type)   
     else:     
         return dist.squareform(dist.pdist(m.transpose(), metric = type))
 
@@ -92,4 +91,8 @@ if __name__ == '__main__':
     for i in distMatrix(m,window=10):
         print(i)
     '''
-    
+
+    m = tests.randomMatrix(3,10)
+    print(m)
+    for i in distMatrix(m,window=3, overlap = 0):
+        pass

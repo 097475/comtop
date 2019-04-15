@@ -26,10 +26,11 @@ class KMTestCase(TestCase):
     def setUp(self):
         self.m = randomMatrix(3,10)
         self.dist = matrix.distMatrix(self.m)
+        self.mapper = keplermodule.getMapper()
     def test(self):
-        projected_data = keplermodule.mapper.fit_transform(self.dist)
-        graph = keplermodule.mapper.map(projected_data)
-        keplermodule.mapper.visualize(graph)
+        projected_data = self.mapper.fit_transform(self.dist)
+        graph = self.mapper.map(projected_data)
+        self.mapper.visualize(graph)
 
 class EntropyTestCase(TestCase):
     def setUp(self):
@@ -43,13 +44,16 @@ if __name__ == '__main__':
     a = edfmodule.readEDF('sample.edf')
     mat = edfmodule.edfToMatrix(a)
     dist = matrix.distMatrix(mat[:,:10])
-    projected_data = keplermodule.mapper.fit_transform(dist)
-    graph = keplermodule.mapper.map(projected_data)
-    keplermodule.mapper.visualize(graph)
+    mapper = keplermodule.getMapper()
+    projected_data = mapper.fit_transform(dist)
+    graph = mapper.map(projected_data)
+    mapper.visualize(graph)
     '''
     a = edfmodule.readEDF('sample.edf')
     mat = edfmodule.edfToMatrix(a)
     dist = matrix.corrMatrix(mat)
-    diagrams = ripsermodule.rips.fit_transform(dist, distance_matrix = True)
-    ripsermodule.rips.plot(diagrams, show = True)
+    rips = ripsermodule.getRips()
+    diagrams = rips.fit_transform(dist, distance_matrix = True)
+    print(diagrams)
+    rips.plot(diagrams, show = True)
 

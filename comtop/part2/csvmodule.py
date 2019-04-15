@@ -1,18 +1,16 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 ##TODO memory leaks
-def getDataFrameFromText(path, index = 0, delim = ','):
-    return pd.read_csv(path, index_col = index, sep = delim)
+def getDataFrameFromText(path, index = 0, delim = ',', header_index = 0):
+    return pd.read_csv(path, index_col = index, sep = delim, header = header_index)
 
-def plotDF(data):
-    plt.plot(data)
-    plt.savefig('test.png')
-    plt.show()
+def plotDF(df):
+    df.plot()
+    plt.savefig('test.svg')  ##inserire path
 
-def getMatrixFromDataFrame(data):
-    return data.values
+def getMatrixFromDataFrame(df):
+    return df.values
 
 '''
 def plotCSV(path):
@@ -37,7 +35,11 @@ if __name__ == '__main__':
     #data = np.genfromtxt('hw_25000.csv',delimiter=',')
     #plt.plotfile('hw_25000.csv',(0,1,2))
     #df = pd.read_csv('hw_25000.csv', index_col=0)
+    #df.plot()
+    #plt.show()
     #plotCSV('hw_25000.csv')
     #plotTXT('hw_25000.csv',',')
-    print(getMatrixFromDataFrame(getDataFrameFromText('hw_25000.csv',0,',')))
-    plotDF(getDataFrameFromText('hw_25000.csv',0,','))
+
+
+    print(getMatrixFromDataFrame(getDataFrameFromText('hw_25000.csv',0,',',0)))
+    plotDF(getDataFrameFromText('hw_25000.csv',0,',',0))

@@ -1,4 +1,6 @@
-from ripser import Rips
+import ripser
 
-rips = Rips()
+def getRips(**kwargs):
+    return ripser.Rips(verbose = False, **kwargs)
+
 
