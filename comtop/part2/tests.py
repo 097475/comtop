@@ -55,5 +55,7 @@ if __name__ == '__main__':
     rips = ripsermodule.getRips()
     diagrams = rips.fit_transform(dist, distance_matrix = True)
     print(diagrams)
-    rips.plot(diagrams, show = True)
+    rips.plot(diagrams)
+    import matplotlib.pyplot as plt
+    plt.savefig("rips.svg")
 
