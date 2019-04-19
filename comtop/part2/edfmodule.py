@@ -109,9 +109,10 @@ if __name__ == '__main__':
     print(type(r))
     print(type(r[0]))
     plotEDF(pyedflib.data.test_generator())
-    '''
+  
     a = readEDF('prova.edf')
     plotEDF(a)
     print(edfToMatrix(a))
+      '''
 
    
